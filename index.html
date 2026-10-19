@@ -1,0 +1,999 @@
+<!DOCTYPE html>
+<html lang="id" class="scroll-smooth dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Profil & Keuangan Profesional</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                    },
+                    colors: {
+                        brand: {
+                            50: '#eef2ff',
+                            100: '#e0e7ff',
+                            500: '#6366f1',
+                            600: '#4f46e5',
+                            700: '#4338ca',
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <!-- FontAwesome for gorgeous icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Chart.js for financial visualization -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <!-- Google Fonts Inter -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        body { font-family: 'Inter', sans-serif; }
+        .glass-card {
+            background: rgba(255, 255, 255, 0.75);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+        }
+        .dark .glass-card {
+            background: rgba(30, 41, 59, 0.75);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+        }
+        /* Custom scrollbar */
+        ::-webkit-scrollbar { width: 8px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 9999px; }
+        .dark ::-webkit-scrollbar-thumb { background: #475569; }
+    </style>
+</head>
+<body class="bg-slate-50 text-slate-800 dark:bg-slate-950 dark:text-slate-100 transition-colors duration-300 min-h-screen flex flex-col justify-between">
+
+    <!-- Header / Navbar -->
+    <header class="sticky top-0 z-50 glass-card border-b border-slate-200 dark:border-slate-800 px-4 lg:px-12 py-4 flex items-center justify-between shadow-sm">
+        <div class="flex items-center space-x-3">
+            <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-indigo-600 to-violet-500 flex items-center justify-center text-white shadow-md shadow-indigo-500/20 font-bold text-lg">
+                <i class="fa-solid fa-wallet"></i>
+            </div>
+            <div>
+                <h1 class="font-bold text-lg leading-tight tracking-tight" id="nav-brand-name">Portofolio & Keuangan</h1>
+                <p class="text-xs text-slate-500 dark:text-slate-400">Pencatat Keuangan & Profil Profesional</p>
+            </div>
+        </div>
+
+        <nav class="hidden md:flex items-center space-x-1 bg-slate-200/60 dark:bg-slate-900/80 p-1 rounded-full border border-slate-300/50 dark:border-slate-800">
+            <button onclick="switchTab('dashboard')" id="btn-tab-dashboard" class="px-5 py-2 rounded-full text-sm font-medium transition-all duration-200 bg-white dark:bg-slate-800 shadow-sm text-indigo-600 dark:text-indigo-400">
+                <i class="fa-solid fa-chart-pie mr-2"></i>Dashboard
+            </button>
+            <button onclick="switchTab('profile')" id="btn-tab-profile" class="px-5 py-2 rounded-full text-sm font-medium transition-all duration-200 text-slate-600 dark:text-slate-400 hover:text-indigo-600">
+                <i class="fa-solid fa-user-tie mr-2"></i>Profil Pribadi
+            </button>
+            <button onclick="switchTab('finance')" id="btn-tab-finance" class="px-5 py-2 rounded-full text-sm font-medium transition-all duration-200 text-slate-600 dark:text-slate-400 hover:text-indigo-600">
+                <i class="fa-solid fa-money-bill-transfer mr-2"></i>Keuangan & Target
+            </button>
+        </nav>
+
+        <div class="flex items-center space-x-3">
+            <!-- Sound Toggle -->
+            <button onclick="toggleSound()" id="sound-toggle-btn" title="Aktifkan/Matikan Suara" class="w-10 h-10 rounded-full flex items-center justify-center bg-slate-200 dark:bg-slate-800 text-slate-600 dark:text-slate-300 hover:scale-105 transition-transform">
+                <i class="fa-solid fa-volume-high" id="sound-icon"></i>
+            </button>
+            <!-- Theme Toggle -->
+            <button onclick="toggleDarkMode()" title="Ganti Tema" class="w-10 h-10 rounded-full flex items-center justify-center bg-slate-200 dark:bg-slate-800 text-slate-600 dark:text-slate-300 hover:scale-105 transition-transform">
+                <i class="fa-solid fa-moon dark:hidden"></i>
+                <i class="fa-solid fa-sun hidden dark:block text-amber-400"></i>
+            </button>
+        </div>
+    </header>
+
+    <!-- Mobile Bottom Navigation -->
+    <div class="md:hidden fixed bottom-0 left-0 right-0 z-50 glass-card border-t border-slate-200 dark:border-slate-800 px-4 py-2 flex justify-around shadow-lg">
+        <button onclick="switchTab('dashboard')" id="mob-btn-dashboard" class="flex flex-col items-center py-1 px-3 text-indigo-600 dark:text-indigo-400 text-xs font-medium">
+            <i class="fa-solid fa-chart-pie text-lg mb-1"></i>Dashboard
+        </button>
+        <button onclick="switchTab('profile')" id="mob-btn-profile" class="flex flex-col items-center py-1 px-3 text-slate-500 dark:text-slate-400 text-xs font-medium">
+            <i class="fa-solid fa-user-tie text-lg mb-1"></i>Profil
+        </button>
+        <button onclick="switchTab('finance')" id="mob-btn-finance" class="flex flex-col items-center py-1 px-3 text-slate-500 dark:text-slate-400 text-xs font-medium">
+            <i class="fa-solid fa-wallet text-lg mb-1"></i>Keuangan
+        </button>
+    </div>
+
+    <!-- Main Content Container -->
+    <main class="flex-grow max-w-7xl w-full mx-auto px-4 lg:px-12 py-8 pb-24 md:pb-12">
+
+        <!-- TAB 1: DASHBOARD -->
+        <section id="tab-dashboard" class="space-y-8 animate-fadeIn">
+            <!-- Welcome Banner -->
+            <div class="relative overflow-hidden rounded-3xl bg-gradient-to-r from-indigo-600 via-violet-600 to-purple-600 p-8 text-white shadow-xl shadow-indigo-500/10">
+                <div class="absolute right-0 top-0 translate-x-8 -translate-y-8 w-64 h-64 bg-white/10 rounded-full blur-2xl pointer-events-none"></div>
+                <div class="relative z-10 flex flex-col md:flex-row items-start md:items-center justify-between gap-6">
+                    <div>
+                        <span class="inline-block px-3 py-1 rounded-full bg-white/20 text-xs font-semibold uppercase tracking-wider mb-3 backdrop-blur-md">Selamat Datang Kembali 👋</span>
+                        <h2 class="text-3xl font-bold tracking-tight mb-2" id="dash-greeting-name">Nama Pengguna Belum Diatur</h2>
+                        <p class="text-indigo-100 max-w-xl text-sm md:text-base" id="dash-greeting-bio">Silakan lengkapi profil profesional Anda dan mulai catat keuangan Anda dari 0 Rp.</p>
+                    </div>
+                    <div class="flex flex-wrap gap-3">
+                        <button onclick="switchTab('finance')" class="px-5 py-2.5 rounded-xl bg-white text-indigo-600 font-semibold text-sm shadow-md hover:bg-indigo-50 transition-all flex items-center">
+                            <i class="fa-solid fa-plus-circle mr-2"></i>Catat Transaksi
+                        </button>
+                        <button onclick="switchTab('profile')" class="px-5 py-2.5 rounded-xl bg-indigo-700/60 border border-white/20 text-white font-semibold text-sm backdrop-blur-md hover:bg-indigo-700 transition-all flex items-center">
+                            <i class="fa-solid fa-pen-to-square mr-2"></i>Edit Profil
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Financial Summary Cards -->
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+                <!-- Total Saldo -->
+                <div class="glass-card rounded-2xl p-6 shadow-sm border border-slate-200 dark:border-slate-800 relative overflow-hidden group hover:shadow-md transition-all">
+                    <div class="absolute right-4 top-4 w-12 h-12 rounded-xl bg-indigo-50 dark:bg-indigo-950/50 flex items-center justify-center text-indigo-600 dark:text-indigo-400 group-hover:scale-110 transition-transform">
+                        <i class="fa-solid fa-wallet text-xl"></i>
+                    </div>
+                    <p class="text-sm font-medium text-slate-500 dark:text-slate-400 mb-1">Total Saldo Bersih</p>
+                    <h3 class="text-2xl font-bold text-slate-900 dark:text-white" id="dash-total-balance">Rp 0</h3>
+                    <div class="mt-4 flex items-center text-xs text-slate-500 dark:text-slate-400 font-medium">
+                        <i class="fa-solid fa-arrow-trend-up mr-1.5"></i>Terhitung dari Pemasukan & Pengeluaran
+                    </div>
+                </div>
+                <!-- Total Pemasukan -->
+                <div class="glass-card rounded-2xl p-6 shadow-sm border border-slate-200 dark:border-slate-800 relative overflow-hidden group hover:shadow-md transition-all">
+                    <div class="absolute right-4 top-4 w-12 h-12 rounded-xl bg-emerald-50 dark:bg-emerald-950/50 flex items-center justify-center text-emerald-600 dark:text-emerald-400 group-hover:scale-110 transition-transform">
+                        <i class="fa-solid fa-arrow-down-long text-xl"></i>
+                    </div>
+                    <p class="text-sm font-medium text-slate-500 dark:text-slate-400 mb-1">Total Pemasukan</p>
+                    <h3 class="text-2xl font-bold text-emerald-600 dark:text-emerald-400" id="dash-total-income">Rp 0</h3>
+                    <div class="mt-4 flex items-center text-xs text-slate-500 dark:text-slate-400">
+                        Akumulasi seluruh pemasukan
+                    </div>
+                </div>
+                <!-- Total Pengeluaran -->
+                <div class="glass-card rounded-2xl p-6 shadow-sm border border-slate-200 dark:border-slate-800 relative overflow-hidden group hover:shadow-md transition-all">
+                    <div class="absolute right-4 top-4 w-12 h-12 rounded-xl bg-rose-50 dark:bg-rose-950/50 flex items-center justify-center text-rose-600 dark:text-rose-400 group-hover:scale-110 transition-transform">
+                        <i class="fa-solid fa-arrow-up-long text-xl"></i>
+                    </div>
+                    <p class="text-sm font-medium text-slate-500 dark:text-slate-400 mb-1">Total Pengeluaran</p>
+                    <h3 class="text-2xl font-bold text-rose-600 dark:text-rose-400" id="dash-total-expense">Rp 0</h3>
+                    <div class="mt-4 flex items-center text-xs text-slate-500 dark:text-slate-400">
+                        Akumulasi seluruh pengeluaran
+                    </div>
+                </div>
+                <!-- Tabungan / Target -->
+                <div class="glass-card rounded-2xl p-6 shadow-sm border border-slate-200 dark:border-slate-800 relative overflow-hidden group hover:shadow-md transition-all">
+                    <div class="absolute right-4 top-4 w-12 h-12 rounded-xl bg-amber-50 dark:bg-amber-950/50 flex items-center justify-center text-amber-600 dark:text-amber-400 group-hover:scale-110 transition-transform">
+                        <i class="fa-solid fa-bullseye text-xl"></i>
+                    </div>
+                    <p class="text-sm font-medium text-slate-500 dark:text-slate-400 mb-1">Target Tabungan</p>
+                    <h3 class="text-2xl font-bold text-amber-600 dark:text-amber-400" id="dash-total-savings">Rp 0</h3>
+                    <div class="mt-4 flex items-center text-xs text-slate-500 dark:text-slate-400" id="dash-savings-status">
+                        Progres: 0% tercapai
+                    </div>
+                </div>
+            </div>
+
+            <!-- Charts & Quick Overview Row -->
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                <!-- Chart Section -->
+                <div class="glass-card rounded-2xl p-6 lg:col-span-2 shadow-sm border border-slate-200 dark:border-slate-800">
+                    <div class="flex items-center justify-between mb-6">
+                        <h3 class="font-bold text-lg text-slate-900 dark:text-white flex items-center">
+                            <i class="fa-solid fa-chart-line text-indigo-600 mr-2"></i>Analisis Keuangan
+                        </h3>
+                        <span class="text-xs px-3 py-1 rounded-full bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400 font-medium">Bulanan</span>
+                    </div>
+                    <div class="relative h-72 w-full flex items-center justify-center">
+                        <canvas id="financeChart"></canvas>
+                    </div>
+                </div>
+
+                <!-- Quick Profile Snippet -->
+                <div class="glass-card rounded-2xl p-6 shadow-sm border border-slate-200 dark:border-slate-800 flex flex-col justify-between">
+                    <div>
+                        <div class="flex items-center justify-between mb-4">
+                            <h3 class="font-bold text-lg text-slate-900 dark:text-white flex items-center">
+                                <i class="fa-solid fa-id-badge text-indigo-600 mr-2"></i>Kartu Profil
+                            </h3>
+                            <button onclick="switchTab('profile')" class="text-xs text-indigo-600 dark:text-indigo-400 font-semibold hover:underline">Lihat Detail</button>
+                        </div>
+                        <div class="flex flex-col items-center text-center mt-6">
+                            <div class="w-24 h-24 rounded-full overflow-hidden border-4 border-indigo-500/30 shadow-md mb-4 bg-slate-200 dark:bg-slate-800 flex items-center justify-center text-slate-400">
+                                <img id="dash-profile-img" src="" alt="Avatar" class="w-full h-full object-cover hidden">
+                                <i id="dash-profile-placeholder" class="fa-solid fa-user text-3xl"></i>
+                            </div>
+                            <h4 class="font-bold text-lg text-slate-900 dark:text-white" id="dash-prof-name">Belum Diatur</h4>
+                            <p class="text-xs text-indigo-600 dark:text-indigo-400 font-medium mb-3" id="dash-prof-title">Profesi Belum Diatur</p>
+                            <p class="text-xs text-slate-500 dark:text-slate-400 line-clamp-2 px-2" id="dash-prof-desc">Belum ada bio yang dimasukkan.</p>
+                        </div>
+                    </div>
+                    <div class="mt-6 pt-4 border-t border-slate-200 dark:border-slate-800 flex justify-center space-x-4 text-slate-500 dark:text-slate-400" id="dash-prof-socials">
+                        <a href="#" target="_blank" class="hover:text-indigo-600 transition-colors"><i class="fa-brands fa-github text-lg"></i></a>
+                        <a href="#" target="_blank" class="hover:text-indigo-600 transition-colors"><i class="fa-brands fa-linkedin text-lg"></i></a>
+                        <a href="#" target="_blank" class="hover:text-indigo-600 transition-colors"><i class="fa-brands fa-instagram text-lg"></i></a>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- TAB 2: PROFIL PRIBADI -->
+        <section id="tab-profile" class="space-y-8 hidden animate-fadeIn">
+            <div class="flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
+                <div>
+                    <h2 class="text-2xl font-bold tracking-tight text-slate-900 dark:text-white">Profil Pribadi & Portofolio</h2>
+                    <p class="text-sm text-slate-500 dark:text-slate-400">Kelola informasi identitas, keterampilan, pengalaman, dan tautan sosial media Anda.</p>
+                </div>
+                <button onclick="saveProfile()" class="px-6 py-2.5 rounded-xl bg-indigo-600 text-white font-semibold text-sm shadow-md shadow-indigo-500/20 hover:bg-indigo-700 transition-all flex items-center">
+                    <i class="fa-solid fa-floppy-disk mr-2"></i>Simpan Perubahan Profil
+                </button>
+            </div>
+
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+                <!-- Left: Edit Basic Info -->
+                <div class="glass-card rounded-2xl p-6 shadow-sm border border-slate-200 dark:border-slate-800 space-y-4">
+                    <h3 class="font-bold text-base text-slate-900 dark:text-white flex items-center mb-2">
+                        <i class="fa-solid fa-user-pen text-indigo-600 mr-2"></i>Informasi Utama
+                    </h3>
+                    <div>
+                        <label class="block text-xs font-semibold text-slate-600 dark:text-slate-400 mb-1">Nama Lengkap</label>
+                        <input type="text" id="input-name" placeholder="Nama Anda" class="w-full px-4 py-2 rounded-xl bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-800 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-semibold text-slate-600 dark:text-slate-400 mb-1">Gelar / Pekerjaan</label>
+                        <input type="text" id="input-title" placeholder="Contoh: Web Developer" class="w-full px-4 py-2 rounded-xl bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-800 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-semibold text-slate-600 dark:text-slate-400 mb-1">URL Foto Profil</label>
+                        <input type="url" id="input-photo" class="w-full px-4 py-2 rounded-xl bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-800 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500" placeholder="https://...">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-semibold text-slate-600 dark:text-slate-400 mb-1">Bio Singkat</label>
+                        <textarea id="input-bio" rows="3" placeholder="Ceritakan sedikit tentang diri Anda..." class="w-full px-4 py-2 rounded-xl bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-800 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"></textarea>
+                    </div>
+                    <div class="grid grid-cols-2 gap-3">
+                        <div>
+                            <label class="block text-xs font-semibold text-slate-600 dark:text-slate-400 mb-1">Email</label>
+                            <input type="email" id="input-email" placeholder="email@example.com" class="w-full px-4 py-2 rounded-xl bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-800 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                        </div>
+                        <div>
+                            <label class="block text-xs font-semibold text-slate-600 dark:text-slate-400 mb-1">Lokasi</label>
+                            <input type="text" id="input-location" placeholder="Kota, Negara" class="w-full px-4 py-2 rounded-xl bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-800 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                        </div>
+                    </div>
+                    <div>
+                        <label class="block text-xs font-semibold text-slate-600 dark:text-slate-400 mb-1">Link GitHub</label>
+                        <input type="url" id="input-github" class="w-full px-4 py-2 rounded-xl bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-800 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500" placeholder="https://github.com/username">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-semibold text-slate-600 dark:text-slate-400 mb-1">Link LinkedIn</label>
+                        <input type="url" id="input-linkedin" class="w-full px-4 py-2 rounded-xl bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-800 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500" placeholder="https://linkedin.com/in/username">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-semibold text-slate-600 dark:text-slate-400 mb-1">Link Instagram</label>
+                        <input type="url" id="input-instagram" class="w-full px-4 py-2 rounded-xl bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-800 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500" placeholder="https://instagram.com/username">
+                    </div>
+                </div>
+
+                <!-- Right: Skills & Portfolio Preview / Customizer -->
+                <div class="lg:col-span-2 space-y-6">
+                    <!-- Skills Editor -->
+                    <div class="glass-card rounded-2xl p-6 shadow-sm border border-slate-200 dark:border-slate-800">
+                        <div class="flex items-center justify-between mb-4">
+                            <h3 class="font-bold text-base text-slate-900 dark:text-white flex items-center">
+                                <i class="fa-solid fa-code text-indigo-600 mr-2"></i>Keahlian / Skills (Pisahkan dengan koma)
+                            </h3>
+                        </div>
+                        <input type="text" id="input-skills" class="w-full px-4 py-2.5 rounded-xl bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-800 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500" placeholder="HTML5, CSS3, JavaScript, Tailwind CSS">
+                        <p class="text-xs text-slate-500 dark:text-slate-400 mt-2">Contoh: HTML, JavaScript, Node.js, UI/UX</p>
+                    </div>
+
+                    <!-- Live Profile Preview Card -->
+                    <div class="glass-card rounded-2xl p-8 shadow-md border border-slate-200 dark:border-slate-800 relative overflow-hidden bg-gradient-to-br from-white/80 to-slate-100/80 dark:from-slate-900/80 dark:to-slate-950/80">
+                        <div class="absolute top-0 right-0 p-6 opacity-10 text-indigo-600 dark:text-indigo-400">
+                            <i class="fa-solid fa-id-card text-8xl"></i>
+                        </div>
+                        <div class="relative z-10">
+                            <span class="text-xs font-bold uppercase tracking-wider text-indigo-600 dark:text-indigo-400 bg-indigo-50 dark:bg-indigo-950/60 px-3 py-1 rounded-full">Pratinjau Kartu Profil Publik</span>
+                            <div class="flex flex-col sm:flex-row items-center gap-6 mt-6">
+                                <div class="w-24 h-24 rounded-2xl overflow-hidden shadow-lg border-2 border-indigo-500/30 bg-slate-200 dark:bg-slate-800 flex items-center justify-center text-slate-400">
+                                    <img id="preview-avatar" src="" class="w-full h-full object-cover hidden">
+                                    <i id="preview-placeholder" class="fa-solid fa-user text-3xl"></i>
+                                </div>
+                                <div class="text-center sm:text-left">
+                                    <h3 class="text-2xl font-bold text-slate-900 dark:text-white" id="preview-name">Nama Belum Diatur</h3>
+                                    <p class="text-indigo-600 dark:text-indigo-400 font-semibold text-sm mb-1" id="preview-title">Profesi Belum Diatur</p>
+                                    <p class="text-xs text-slate-500 dark:text-slate-400 flex items-center justify-center sm:justify-start gap-3 mt-1">
+                                        <span><i class="fa-solid fa-envelope mr-1"></i><span id="preview-email">email@example.com</span></span>
+                                        <span><i class="fa-solid fa-location-dot mr-1"></i><span id="preview-location">Lokasi</span></span>
+                                    </p>
+                                </div>
+                            </div>
+                            <p class="text-sm text-slate-600 dark:text-slate-300 mt-6 leading-relaxed" id="preview-bio">
+                                Belum ada bio yang dimasukkan.
+                            </p>
+                            <div class="mt-6 pt-6 border-t border-slate-200 dark:border-slate-800">
+                                <h4 class="text-xs font-bold uppercase tracking-wider text-slate-400 mb-3">Keahlian Utama</h4>
+                                <div class="flex flex-wrap gap-2" id="preview-skills-container">
+                                    <span class="text-xs text-slate-400 italic">Belum ada keahlian ditambahkan</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- TAB 3: KEUANGAN & TARGET -->
+        <section id="tab-finance" class="space-y-8 hidden animate-fadeIn">
+            <div class="flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
+                <div>
+                    <h2 class="text-2xl font-bold tracking-tight text-slate-900 dark:text-white">Pencatat Keuangan & Target Menabung</h2>
+                    <p class="text-sm text-slate-500 dark:text-slate-400">Catat setiap pemasukan, pengeluaran, dan atur target tabungan impian Anda.</p>
+                </div>
+                <div class="flex items-center gap-3">
+                    <button onclick="openSavingsModal()" class="px-4 py-2 rounded-xl bg-amber-500 text-white font-semibold text-sm shadow-md shadow-amber-500/20 hover:bg-amber-600 transition-all flex items-center">
+                        <i class="fa-solid fa-bullseye mr-2"></i>Atur Target Tabungan
+                    </button>
+                    <button onclick="resetFinanceData()" class="px-3 py-2 rounded-xl bg-rose-50 text-rose-600 dark:bg-rose-950/40 dark:text-rose-400 font-semibold text-sm hover:bg-rose-100 transition-all" title="Reset Data Keuangan">
+                        <i class="fa-solid fa-rotate-right"></i>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Savings Goal Progress Card -->
+            <div class="glass-card rounded-2xl p-6 shadow-sm border border-slate-200 dark:border-slate-800 bg-gradient-to-r from-amber-500/10 via-orange-500/5 to-transparent">
+                <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-4">
+                    <div>
+                        <span class="text-xs font-bold uppercase tracking-wider text-amber-600 dark:text-amber-400 bg-amber-100 dark:bg-amber-950/60 px-3 py-1 rounded-full">Target Aktif</span>
+                        <h3 class="text-xl font-bold text-slate-900 dark:text-white mt-2" id="savings-goal-title">Belum Ada Target</h3>
+                        <p class="text-xs text-slate-500 dark:text-slate-400">Target: <span id="savings-goal-target" class="font-semibold text-slate-700 dark:text-slate-300">Rp 0</span></p>
+                    </div>
+                    <div class="text-right">
+                        <span class="text-2xl font-bold text-amber-600 dark:text-amber-400" id="savings-current-amount">Rp 0</span>
+                        <p class="text-xs text-slate-500 dark:text-slate-400" id="savings-percentage">0% dari target</p>
+                    </div>
+                </div>
+                <!-- Progress Bar -->
+                <div class="w-full bg-slate-200 dark:bg-slate-800 h-3 rounded-full overflow-hidden p-0.5">
+                    <div id="savings-progress-bar" class="bg-gradient-to-r from-amber-500 to-orange-500 h-full rounded-full transition-all duration-500" style="width: 0%"></div>
+                </div>
+            </div>
+
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+                <!-- Add Transaction Form -->
+                <div class="glass-card rounded-2xl p-6 shadow-sm border border-slate-200 dark:border-slate-800 space-y-4 h-fit">
+                    <h3 class="font-bold text-base text-slate-900 dark:text-white flex items-center mb-2">
+                        <i class="fa-solid fa-plus-circle text-indigo-600 mr-2"></i>Tambah Transaksi Baru
+                    </h3>
+                    <form id="transaction-form" onsubmit="addTransaction(event)" class="space-y-4">
+                        <div>
+                            <label class="block text-xs font-semibold text-slate-600 dark:text-slate-400 mb-1">Tipe Transaksi</label>
+                            <div class="grid grid-cols-3 gap-2">
+                                <button type="button" onclick="setTxType('income')" id="btn-type-income" class="py-2 px-3 rounded-xl border border-slate-300 dark:border-slate-700 text-xs font-semibold transition-all bg-emerald-500 text-white shadow-sm">Pemasukan</button>
+                                <button type="button" onclick="setTxType('expense')" id="btn-type-expense" class="py-2 px-3 rounded-xl border border-slate-300 dark:border-slate-700 text-xs font-semibold transition-all text-slate-600 dark:text-slate-300">Pengeluaran</button>
+                                <button type="button" onclick="setTxType('saving')" id="btn-type-saving" class="py-2 px-3 rounded-xl border border-slate-300 dark:border-slate-700 text-xs font-semibold transition-all text-slate-600 dark:text-slate-300">Tabungan</button>
+                            </div>
+                        </div>
+                        <div>
+                            <label class="block text-xs font-semibold text-slate-600 dark:text-slate-400 mb-1">Keterangan / Judul</label>
+                            <input type="text" id="tx-desc" required placeholder="Contoh: Gaji Bulanan, Makan Siang..." class="w-full px-4 py-2 rounded-xl bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-800 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                        </div>
+                        <div>
+                            <label class="block text-xs font-semibold text-slate-600 dark:text-slate-400 mb-1">Jumlah Nominal (Rp)</label>
+                            <input type="number" id="tx-amount" required min="1" placeholder="50000" class="w-full px-4 py-2 rounded-xl bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-800 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                        </div>
+                        <div>
+                            <label class="block text-xs font-semibold text-slate-600 dark:text-slate-400 mb-1">Kategori</label>
+                            <select id="tx-category" class="w-full px-4 py-2 rounded-xl bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-800 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                                <option value="Gaji / Pendapatan">Gaji / Pendapatan</option>
+                                <option value="Freelance / Proyek">Freelance / Proyek</option>
+                                <option value="Makanan & Minuman">Makanan & Minuman</option>
+                                <option value="Transportasi">Transportasi</option>
+                                <option value="Belanja & Kebutuhan">Belanja & Kebutuhan</option>
+                                <option value="Hiburan & Lainnya">Hiburan & Lainnya</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="block text-xs font-semibold text-slate-600 dark:text-slate-400 mb-1">Tanggal</label>
+                            <input type="date" id="tx-date" required class="w-full px-4 py-2 rounded-xl bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-800 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                        </div>
+                        <button type="submit" class="w-full py-3 rounded-xl bg-indigo-600 text-white font-semibold text-sm shadow-md shadow-indigo-500/20 hover:bg-indigo-700 transition-all flex items-center justify-center">
+                            <i class="fa-solid fa-check mr-2"></i>Simpan Transaksi
+                        </button>
+                    </form>
+                </div>
+
+                <!-- Transactions History Table / List -->
+                <div class="lg:col-span-2 glass-card rounded-2xl p-6 shadow-sm border border-slate-200 dark:border-slate-800 flex flex-col justify-between">
+                    <div>
+                        <div class="flex items-center justify-between mb-4">
+                            <h3 class="font-bold text-base text-slate-900 dark:text-white flex items-center">
+                                <i class="fa-solid fa-clock-rotate-left text-indigo-600 mr-2"></i>Riwayat Transaksi
+                            </h3>
+                            <div class="flex items-center gap-2">
+                                <select id="filter-category" onchange="renderTransactions()" class="px-3 py-1 rounded-lg bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-800 text-xs font-medium">
+                                    <option value="all">Semua Kategori</option>
+                                    <option value="income">Pemasukan</option>
+                                    <option value="expense">Pengeluaran</option>
+                                    <option value="saving">Tabungan</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <!-- Transactions List Container -->
+                        <div class="overflow-x-auto max-h-[450px] overflow-y-auto pr-1">
+                            <div id="transactions-list" class="space-y-3">
+                                <!-- Rendered dynamically -->
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- Savings Modal -->
+    <div id="savings-modal" class="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/60 backdrop-blur-sm hidden animate-fadeIn">
+        <div class="glass-card bg-white dark:bg-slate-900 rounded-3xl p-6 md:p-8 max-w-md w-full mx-4 shadow-2xl border border-slate-200 dark:border-slate-800">
+            <div class="flex items-center justify-between mb-6">
+                <h3 class="font-bold text-lg text-slate-900 dark:text-white flex items-center">
+                    <i class="fa-solid fa-bullseye text-amber-500 mr-2"></i>Atur Target Tabungan
+                </h3>
+                <button onclick="closeSavingsModal()" class="w-8 h-8 rounded-full bg-slate-100 dark:bg-slate-800 flex items-center justify-center text-slate-500 hover:bg-slate-200">
+                    <i class="fa-solid fa-xmark"></i>
+                </button>
+            </div>
+            <form onsubmit="saveSavingsGoal(event)" class="space-y-4">
+                <div>
+                    <label class="block text-xs font-semibold text-slate-600 dark:text-slate-400 mb-1">Nama Target / Impian</label>
+                    <input type="text" id="modal-goal-title" required placeholder="Contoh: Dana Darurat / Laptop" class="w-full px-4 py-2 rounded-xl bg-slate-50 dark:bg-slate-800 border border-slate-300 dark:border-slate-700 text-sm focus:outline-none focus:ring-2 focus:ring-amber-500">
+                </div>
+                <div>
+                    <label class="block text-xs font-semibold text-slate-600 dark:text-slate-400 mb-1">Target Nominal (Rp)</label>
+                    <input type="number" id="modal-goal-target" required min="1" placeholder="10000000" class="w-full px-4 py-2 rounded-xl bg-slate-50 dark:bg-slate-800 border border-slate-300 dark:border-slate-700 text-sm focus:outline-none focus:ring-2 focus:ring-amber-500">
+                </div>
+                <div class="flex justify-end gap-3 mt-6">
+                    <button type="button" onclick="closeSavingsModal()" class="px-4 py-2 rounded-xl bg-slate-200 dark:bg-slate-800 text-slate-700 dark:text-slate-300 text-sm font-semibold hover:bg-slate-300">Batal</button>
+                    <button type="submit" class="px-5 py-2 rounded-xl bg-amber-500 text-white text-sm font-semibold shadow-md shadow-amber-500/20 hover:bg-amber-600">Simpan Target</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Notification Toast Container -->
+    <div id="toast-container" class="fixed bottom-6 right-6 z-50 flex flex-col space-y-2 pointer-events-none"></div>
+
+    <!-- Footer -->
+    <footer class="glass-card border-t border-slate-200 dark:border-slate-800 py-6 text-center text-xs text-slate-500 dark:text-slate-400">
+        <p>&copy; 2026 Portofolio & Keuangan Profesional. Dilindungi & Disimpan secara lokal (localStorage).</p>
+    </footer>
+
+    <!-- JavaScript Application Logic -->
+    <script>
+        /* --- STATE & DATA MANAGEMENT (START FROM SCRATCH BY DEFAULT) --- */
+        let state = {
+            darkMode: true,
+            soundEnabled: true,
+            activeTab: 'dashboard',
+            profile: {
+                name: '',
+                title: '',
+                photo: '',
+                bio: '',
+                email: '',
+                location: '',
+                github: '',
+                linkedin: '',
+                instagram: '',
+                skills: []
+            },
+            savingsGoal: {
+                title: 'Belum Ada Target',
+                target: 0
+            },
+            transactions: []
+        };
+
+        let currentTxType = 'income';
+        let financeChartInstance = null;
+
+        /* --- WEB AUDIO API SOUND EFFECTS --- */
+        const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+        function playSound(type) {
+            if (!state.soundEnabled) return;
+            try {
+                if (audioCtx.state === 'suspended') {
+                    audioCtx.resume();
+                }
+                const osc = audioCtx.createOscillator();
+                const gainNode = audioCtx.createGain();
+                osc.connect(gainNode);
+                gainNode.connect(audioCtx.destination);
+
+                const now = audioCtx.currentTime;
+                if (type === 'click') {
+                    osc.type = 'sine';
+                    osc.frequency.setValueAtTime(400, now);
+                    osc.frequency.exponentialRampToValueAtTime(800, now + 0.08);
+                    gainNode.gain.setValueAtTime(0.1, now);
+                    gainNode.gain.exponentialRampToValueAtTime(0.001, now + 0.08);
+                    osc.start(now);
+                    osc.stop(now + 0.08);
+                } else if (type === 'success') {
+                    osc.type = 'triangle';
+                    osc.frequency.setValueAtTime(523.25, now); // C5
+                    osc.frequency.setValueAtTime(659.25, now + 0.1); // E5
+                    osc.frequency.setValueAtTime(783.99, now + 0.2); // G5
+                    gainNode.gain.setValueAtTime(0.12, now);
+                    gainNode.gain.exponentialRampToValueAtTime(0.001, now + 0.35);
+                    osc.start(now);
+                    osc.stop(now + 0.35);
+                }
+            } catch (e) {
+                console.log('Audio error:', e);
+            }
+        }
+
+        function toggleSound() {
+            state.soundEnabled = !state.soundEnabled;
+            const icon = document.getElementById('sound-icon');
+            if (state.soundEnabled) {
+                icon.className = "fa-solid fa-volume-high";
+                showToast('Efek suara diaktifkan', 'info');
+            } else {
+                icon.className = "fa-solid fa-volume-xmark";
+                showToast('Efek suara dimatikan', 'info');
+            }
+            playSound('click');
+        }
+
+        /* --- LOCAL STORAGE PERSISTENCE --- */
+        function loadData() {
+            const savedState = localStorage.getItem('pro_profile_finance_app_v2');
+            if (savedState) {
+                try {
+                    state = JSON.parse(savedState);
+                } catch (e) {
+                    console.error('Failed to parse storage', e);
+                }
+            }
+            if (state.darkMode) {
+                document.documentElement.classList.add('dark');
+            } else {
+                document.documentElement.classList.remove('dark');
+            }
+        }
+
+        function saveData() {
+            localStorage.setItem('pro_profile_finance_app_v2', JSON.stringify(state));
+        }
+
+        /* --- UI & TAB NAVIGATION --- */
+        function switchTab(tabId) {
+            playSound('click');
+            state.activeTab = tabId;
+
+            ['dashboard', 'profile', 'finance'].forEach(t => {
+                const el = document.getElementById(`tab-${t}`);
+                const btnDesk = document.getElementById(`btn-tab-${t}`);
+                const btnMob = document.getElementById(`mob-btn-${t}`);
+
+                if (t === tabId) {
+                    el.classList.remove('hidden');
+                    if (btnDesk) {
+                        btnDesk.className = "px-5 py-2 rounded-full text-sm font-medium transition-all duration-200 bg-white dark:bg-slate-800 shadow-sm text-indigo-600 dark:text-indigo-400";
+                    }
+                    if (btnMob) {
+                        btnMob.className = "flex flex-col items-center py-1 px-3 text-indigo-600 dark:text-indigo-400 text-xs font-medium";
+                    }
+                } else {
+                    el.classList.add('hidden');
+                    if (btnDesk) {
+                        btnDesk.className = "px-5 py-2 rounded-full text-sm font-medium transition-all duration-200 text-slate-600 dark:text-slate-400 hover:text-indigo-600";
+                    }
+                    if (btnMob) {
+                        btnMob.className = "flex flex-col items-center py-1 px-3 text-slate-500 dark:text-slate-400 text-xs font-medium";
+                    }
+                }
+            });
+
+            if (tabId === 'dashboard') {
+                updateDashboard();
+            } else if (tabId === 'finance') {
+                renderTransactions();
+            }
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        function toggleDarkMode() {
+            playSound('click');
+            state.darkMode = !state.darkMode;
+            if (state.darkMode) {
+                document.documentElement.classList.add('dark');
+            } else {
+                document.documentElement.classList.remove('dark');
+            }
+            saveData();
+            if (financeChartInstance) updateChart();
+        }
+
+        /* --- TOAST NOTIFICATION --- */
+        function showToast(message, type = 'success') {
+            const container = document.getElementById('toast-container');
+            const toast = document.createElement('div');
+            let bgClass = 'bg-emerald-600 text-white';
+            let icon = 'fa-circle-check';
+            if (type === 'info') { bgClass = 'bg-indigo-600 text-white'; icon = 'fa-circle-info'; }
+            if (type === 'error') { bgClass = 'bg-rose-600 text-white'; icon = 'fa-circle-exclamation'; }
+
+            toast.className = `pointer-events-auto flex items-center space-x-3 px-4 py-3 rounded-2xl shadow-lg ${bgClass} text-sm font-medium transform translate-y-4 opacity-0 transition-all duration-300`;
+            toast.innerHTML = `<i class="fa-solid ${icon} text-lg"></i><span>${message}</span>`;
+            
+            container.appendChild(toast);
+            setTimeout(() => {
+                toast.classList.remove('translate-y-4', 'opacity-0');
+            }, 10);
+
+            setTimeout(() => {
+                toast.classList.add('translate-y-4', 'opacity-0');
+                setTimeout(() => toast.remove(), 300);
+            }, 3000);
+        }
+
+        /* --- PROFILE MANAGEMENT --- */
+        function initProfileUI() {
+            const p = state.profile;
+            const displayName = p.name ? p.name : 'Nama Pengguna Belum Diatur';
+            const displayTitle = p.title ? p.title : 'Profesi Belum Diatur';
+            const displayBio = p.bio ? p.bio : 'Belum ada bio yang dimasukkan.';
+
+            document.getElementById('nav-brand-name').innerText = p.name ? p.name : 'Portofolio & Keuangan';
+            document.getElementById('dash-greeting-name').innerText = displayName;
+            document.getElementById('dash-greeting-bio').innerText = p.bio ? p.bio : 'Silakan lengkapi profil profesional Anda dan mulai catat keuangan Anda dari 0 Rp.';
+            document.getElementById('dash-prof-name').innerText = displayName;
+            document.getElementById('dash-prof-title').innerText = displayTitle;
+            document.getElementById('dash-prof-desc').innerText = displayBio;
+
+            const dashImg = document.getElementById('dash-profile-img');
+            const dashPlaceholder = document.getElementById('dash-profile-placeholder');
+            if (p.photo) {
+                dashImg.src = p.photo;
+                dashImg.classList.remove('hidden');
+                dashPlaceholder.classList.add('hidden');
+            } else {
+                dashImg.classList.add('hidden');
+                dashPlaceholder.classList.remove('hidden');
+            }
+
+            // Form inputs
+            document.getElementById('input-name').value = p.name || '';
+            document.getElementById('input-title').value = p.title || '';
+            document.getElementById('input-photo').value = p.photo || '';
+            document.getElementById('input-bio').value = p.bio || '';
+            document.getElementById('input-email').value = p.email || '';
+            document.getElementById('input-location').value = p.location || '';
+            document.getElementById('input-github').value = p.github || '';
+            document.getElementById('input-linkedin').value = p.linkedin || '';
+            document.getElementById('input-instagram').value = p.instagram || '';
+            document.getElementById('input-skills').value = (p.skills || []).join(', ');
+
+            updatePreviewCard();
+        }
+
+        function updatePreviewCard() {
+            const name = document.getElementById('input-name').value;
+            const title = document.getElementById('input-title').value;
+            const photo = document.getElementById('input-photo').value;
+            const bio = document.getElementById('input-bio').value;
+            const email = document.getElementById('input-email').value;
+            const location = document.getElementById('input-location').value;
+            const skillsStr = document.getElementById('input-skills').value;
+
+            document.getElementById('preview-name').innerText = name || 'Nama Belum Diatur';
+            document.getElementById('preview-title').innerText = title || 'Profesi Belum Diatur';
+            document.getElementById('preview-email').innerText = email || 'email@example.com';
+            document.getElementById('preview-location').innerText = location || 'Lokasi';
+            document.getElementById('preview-bio').innerText = bio || 'Belum ada bio yang dimasukkan.';
+
+            const prevAvatar = document.getElementById('preview-avatar');
+            const prevPlaceholder = document.getElementById('preview-placeholder');
+            if (photo) {
+                prevAvatar.src = photo;
+                prevAvatar.classList.remove('hidden');
+                prevPlaceholder.classList.add('hidden');
+            } else {
+                prevAvatar.classList.add('hidden');
+                prevPlaceholder.classList.remove('hidden');
+            }
+
+            const skillsContainer = document.getElementById('preview-skills-container');
+            skillsContainer.innerHTML = '';
+            const skillsArr = skillsStr.split(',').map(s => s.trim()).filter(Boolean);
+            if (skillsArr.length === 0) {
+                skillsContainer.innerHTML = `<span class="text-xs text-slate-400 italic">Belum ada keahlian ditambahkan</span>`;
+            } else {
+                skillsArr.forEach(skill => {
+                    const badge = document.createElement('span');
+                    badge.className = 'px-3 py-1 rounded-full bg-indigo-50 dark:bg-indigo-950/60 text-indigo-600 dark:text-indigo-400 text-xs font-semibold';
+                    badge.innerText = skill;
+                    skillsContainer.appendChild(badge);
+                });
+            }
+        }
+
+        // Live update preview on input change
+        ['input-name', 'input-title', 'input-photo', 'input-bio', 'input-email', 'input-location', 'input-skills'].forEach(id => {
+            const el = document.getElementById(id);
+            if (el) el.addEventListener('input', updatePreviewCard);
+        });
+
+        function saveProfile() {
+            playSound('success');
+            state.profile = {
+                name: document.getElementById('input-name').value,
+                title: document.getElementById('input-title').value,
+                photo: document.getElementById('input-photo').value,
+                bio: document.getElementById('input-bio').value,
+                email: document.getElementById('input-email').value,
+                location: document.getElementById('input-location').value,
+                github: document.getElementById('input-github').value,
+                linkedin: document.getElementById('input-linkedin').value,
+                instagram: document.getElementById('input-instagram').value,
+                skills: document.getElementById('input-skills').value.split(',').map(s => s.trim()).filter(Boolean)
+            };
+            saveData();
+            initProfileUI();
+            updateDashboard();
+            showToast('Profil berhasil disimpan & tersimpan permanen!', 'success');
+        }
+
+        /* --- FINANCE & SAVINGS LOGIC --- */
+        function formatRupiah(num) {
+            return new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', maximumFractionDigits: 0 }).format(num);
+        }
+
+        function setTxType(type) {
+            playSound('click');
+            currentTxType = type;
+            ['income', 'expense', 'saving'].forEach(t => {
+                const btn = document.getElementById(`btn-type-${t}`);
+                btn.className = "py-2 px-3 rounded-xl border border-slate-300 dark:border-slate-700 text-xs font-semibold transition-all text-slate-600 dark:text-slate-300";
+                if (t === type) {
+                    if (t === 'income') btn.className = "py-2 px-3 rounded-xl border border-slate-300 dark:border-slate-700 text-xs font-semibold transition-all bg-emerald-500 text-white shadow-sm";
+                    if (t === 'expense') btn.className = "py-2 px-3 rounded-xl border border-slate-300 dark:border-slate-700 text-xs font-semibold transition-all bg-rose-500 text-white shadow-sm";
+                    if (t === 'saving') btn.className = "py-2 px-3 rounded-xl border border-slate-300 dark:border-slate-700 text-xs font-semibold transition-all bg-amber-500 text-white shadow-sm";
+                }
+            });
+        }
+
+        function addTransaction(e) {
+            e.preventDefault();
+            const desc = document.getElementById('tx-desc').value;
+            const amount = parseFloat(document.getElementById('tx-amount').value);
+            const category = document.getElementById('tx-category').value;
+            const date = document.getElementById('tx-date').value;
+
+            const newTx = {
+                id: Date.now().toString(),
+                type: currentTxType,
+                desc,
+                amount,
+                category,
+                date
+            };
+
+            state.transactions.unshift(newTx);
+            saveData();
+            playSound('success');
+            showToast('Transaksi berhasil dicatat & disimpan!', 'success');
+
+            document.getElementById('transaction-form').reset();
+            document.getElementById('tx-date').valueAsDate = new Date();
+            setTxType('income');
+
+            updateDashboard();
+            renderTransactions();
+        }
+
+        function deleteTransaction(id) {
+            playSound('click');
+            state.transactions = state.transactions.filter(t => t.id !== id);
+            saveData();
+            updateDashboard();
+            renderTransactions();
+            showToast('Transaksi dihapus', 'info');
+        }
+
+        function calculateFinanceSummary() {
+            let totalIncome = 0;
+            let totalExpense = 0;
+            let totalSaving = 0;
+
+            state.transactions.forEach(t => {
+                if (t.type === 'income') totalIncome += t.amount;
+                else if (t.type === 'expense') totalExpense += t.amount;
+                else if (t.type === 'saving') totalSaving += t.amount;
+            });
+
+            const netBalance = totalIncome - totalExpense;
+            return { totalIncome, totalExpense, totalSaving, netBalance };
+        }
+
+        function updateDashboard() {
+            const { totalIncome, totalExpense, totalSaving, netBalance } = calculateFinanceSummary();
+
+            document.getElementById('dash-total-balance').innerText = formatRupiah(netBalance);
+            document.getElementById('dash-total-income').innerText = formatRupiah(totalIncome);
+            document.getElementById('dash-total-expense').innerText = formatRupiah(totalExpense);
+            document.getElementById('dash-total-savings').innerText = formatRupiah(totalSaving);
+
+            // Savings Goal Progress
+            const goalTarget = state.savingsGoal.target || 1;
+            const percentage = state.savingsGoal.target > 0 ? Math.min(Math.round((totalSaving / goalTarget) * 100), 100) : 0;
+            
+            document.getElementById('savings-goal-title').innerText = state.savingsGoal.title || 'Belum Ada Target';
+            document.getElementById('savings-goal-target').innerText = formatRupiah(state.savingsGoal.target || 0);
+            document.getElementById('savings-current-amount').innerText = formatRupiah(totalSaving);
+            document.getElementById('savings-percentage').innerText = `${percentage}% dari target`;
+            document.getElementById('savings-progress-bar').style.width = `${percentage}%`;
+            document.getElementById('dash-savings-status').innerText = `Progres: ${percentage}% tercapai`;
+
+            updateChart();
+        }
+
+        function renderTransactions() {
+            const container = document.getElementById('transactions-list');
+            const filter = document.getElementById('filter-category').value;
+            container.innerHTML = '';
+
+            const filtered = state.transactions.filter(t => {
+                if (filter === 'all') return true;
+                return t.type === filter;
+            });
+
+            if (filtered.length === 0) {
+                container.innerHTML = `<div class="text-center py-8 text-slate-400 text-sm">Belum ada data transaksi tersimpan.</div>`;
+                return;
+            }
+
+            filtered.forEach(t => {
+                let badgeColor = 'bg-emerald-50 dark:bg-emerald-950/50 text-emerald-600 dark:text-emerald-400';
+                let sign = '+';
+                let icon = 'fa-arrow-down-long';
+                if (t.type === 'expense') {
+                    badgeColor = 'bg-rose-50 dark:bg-rose-950/50 text-rose-600 dark:text-rose-400';
+                    sign = '-';
+                    icon = 'fa-arrow-up-long';
+                } else if (t.type === 'saving') {
+                    badgeColor = 'bg-amber-50 dark:bg-amber-950/50 text-amber-600 dark:text-amber-400';
+                    sign = '+';
+                    icon = 'fa-bullseye';
+                }
+
+                const item = document.createElement('div');
+                item.className = 'flex items-center justify-between p-3.5 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200/80 dark:border-slate-800 hover:shadow-sm transition-all';
+                item.innerHTML = `
+                    <div class="flex items-center space-x-3">
+                        <div class="w-10 h-10 rounded-xl ${badgeColor} flex items-center justify-center font-bold text-sm">
+                            <i class="fa-solid ${icon}"></i>
+                        </div>
+                        <div>
+                            <h4 class="font-bold text-sm text-slate-900 dark:text-white">${t.desc}</h4>
+                            <p class="text-xs text-slate-400">${t.category} &bull; ${t.date}</p>
+                        </div>
+                    </div>
+                    <div class="flex items-center space-x-4">
+                        <span class="font-bold text-sm ${t.type === 'expense' ? 'text-rose-600 dark:text-rose-400' : 'text-emerald-600 dark:text-emerald-400'}">
+                            ${sign} ${formatRupiah(t.amount)}
+                        </span>
+                        <button onclick="deleteTransaction('${t.id}')" class="text-slate-400 hover:text-rose-600 transition-colors p-1" title="Hapus">
+                            <i class="fa-solid fa-trash-can text-xs"></i>
+                        </button>
+                    </div>
+                `;
+                container.appendChild(item);
+            });
+        }
+
+        function resetFinanceData() {
+            if (confirm('Apakah Anda yakin ingin mereset seluruh data transaksi keuangan?')) {
+                state.transactions = [];
+                saveData();
+                updateDashboard();
+                renderTransactions();
+                showToast('Data keuangan berhasil direset', 'info');
+            }
+        }
+
+        /* --- SAVINGS GOAL MODAL --- */
+        function openSavingsModal() {
+            playSound('click');
+            document.getElementById('modal-goal-title').value = state.savingsGoal.title === 'Belum Ada Target' ? '' : state.savingsGoal.title;
+            document.getElementById('modal-goal-target').value = state.savingsGoal.target || '';
+            document.getElementById('savings-modal').classList.remove('hidden');
+        }
+
+        function closeSavingsModal() {
+            playSound('click');
+            document.getElementById('savings-modal').classList.add('hidden');
+        }
+
+        function saveSavingsGoal(e) {
+            e.preventDefault();
+            const title = document.getElementById('modal-goal-title').value;
+            const target = parseFloat(document.getElementById('modal-goal-target').value);
+
+            state.savingsGoal = { title, target };
+            saveData();
+            playSound('success');
+            closeSavingsModal();
+            updateDashboard();
+            showToast('Target tabungan diperbarui & tersimpan!', 'success');
+        }
+
+        /* --- CHART.JS ANALYTICS --- */
+        function updateChart() {
+            const ctx = document.getElementById('financeChart').getContext('2d');
+            const { totalIncome, totalExpense, totalSaving } = calculateFinanceSummary();
+
+            const isDark = document.documentElement.classList.contains('dark');
+            const textColor = isDark ? '#94a3b8' : '#64748b';
+
+            if (financeChartInstance) {
+                financeChartInstance.destroy();
+            }
+
+            financeChartInstance = new Chart(ctx, {
+                type: 'doughnut',
+                data: {
+                    labels: ['Pemasukan', 'Pengeluaran', 'Tabungan'],
+                    datasets: [{
+                        data: [totalIncome || 1, totalExpense || 0, totalSaving || 0],
+                        backgroundColor: [
+                            '#10b981', // Emerald
+                            '#f43f5e', // Rose
+                            '#f59e0b'  // Amber
+                        ],
+                        borderWidth: 0,
+                        hoverOffset: 6
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            position: 'bottom',
+                            labels: {
+                                color: textColor,
+                                font: { family: 'Inter', size: 12, weight: '500' },
+                                padding: 20
+                            }
+                        }
+                    },
+                    cutout: '70%'
+                }
+            });
+        }
+
+        /* --- INITIALIZE APP ON LOAD --- */
+        window.onload = function() {
+            loadData();
+            initProfileUI();
+            updateDashboard();
+            renderTransactions();
+
+            // Default date for transaction form
+            const dateInput = document.getElementById('tx-date');
+            if (dateInput) {
+                dateInput.valueAsDate = new Date();
+            }
+        };
+    </script>
+</body>
+</html>
